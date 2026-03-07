@@ -1,134 +1,132 @@
-# Loan-Payback-Prediction
-How can we identify borrowers who are likely to repay their loans versus those who are at risk of default, using available financial and demographic data?
 
-# Loan Payback Prediction – Business & Risk Analysis
+# Credit Risk Dataset Analysis
 
-## 1. Business Understanding
+## Overview
 
-### 1.1 Business Context
-Financial institutions provide loans to customers with diverse financial backgrounds, employment stability, and credit histories. 
-While lending generates revenue through interest, loan defaults pose a significant financial risk to the institution.
+This project is about **analyzing the loan dataset in order to gain insights about the borrowers and understand the factors that are associated with loan default risk**. This analysis is about **performing exploratory data analysis (EDA) on the loan dataset and preparing the features for modeling**.
 
-The core challenge for lenders is to strike a balance between:
-- Maximizing profitability by approving loans, and  
-- Minimizing credit risk caused by borrower defaults.
-
-This project analyzes historical loan data to understand repayment behavior and identify key risk drivers that influence loan payback outcomes.
+The process involves **data cleaning, outlier handling, checking for multicollinearity, and categorical variable selection** in order to ensure that the data is in the correct state before building reliable credit risk models.
 
 ---
 
-### 1.2 Business Problem Statement
-The objective of this analysis is to answer the following question:
+# Description of the Data Set
 
-**How can we identify borrowers who are likely to repay their loans versus those who are at risk of default using available financial and demographic data?**
+This data set contains **information about the customer's demographics, financial information, and loan information** in order to **analyze the risk of loan repayment or default**.
 
-This is a **decision-support problem**, not just a prediction task, where incorrect decisions have direct financial consequences.
+The features in the data set include:
 
----
+* Demographics of borrowers (age, education, marital status, gender)
+* Financial information (income, debt-to-income ratio, credit score)
+* Loan information (loan amount, interest rate, loan term, installment)
+* Credit behavior (delinquencies, credit limit, account balance)
+* Employment status and loan purposes
 
-### 1.3 Target Variable
-- **Target Column:** `loan_paid_back`
-  - `1` → Loan paid back  
-  - `0` → Loan not paid back (default)
-
-This represents a binary classification problem with asymmetric risk.
+The target variable is **whether the customer defaulted on the loan or not**.
 
 ---
 
-### 1.4 Business Impact of Misclassification
+# Project Workflow
 
-In real-world lending, different types of errors have unequal costs:
+## 1. Data Upload and Initial Exploration
 
-| Error Type | Business Impact |
-|----------|-----------------|
-| False Positive (Risky borrower approved) | Direct financial loss, increased non-performing assets |
-| False Negative (Safe borrower rejected) | Lost revenue and potential customer dissatisfaction |
+The data set is **uploaded into the workspace and initial exploration is done in order to understand the structure of the data and the features in the data set**.
 
-Due to this imbalance, accuracy alone is not an appropriate evaluation metric for this problem.
+Some of the **initial exploration techniques include inspecting the data set's dimensions, checking for missing values, understanding the data types, and understanding the features in the data set**. Some **visualizations are also done in order to understand the patterns in the data set**. Some of the visualizations include income distributions, loan amount distributions, credit score distributions, and default risk distributions.
 
 ---
 
-### 1.5 Business Objectives
-This analysis aims to support the following objectives:
+## 2. Outlier Treatment using Winsorization
 
-1. **Risk Identification**  
-   Identify borrower attributes associated with higher default risk.
+Financial data sets are prone to **extreme values in the data sets, and it is important to handle these values in order to obtain reliable results**.
 
-2. **Portfolio Risk Assessment**  
-   Understand how default risk varies across income levels, credit scores, employment status, and loan purposes.
+To resolve this problem, **winsorization** was applied to specific numerical features. Winsorization limits extreme values by setting them to specific percentile limits.
 
-3. **Policy Guidance**  
-   Provide analytical insights to guide loan approval criteria and risk-based pricing strategies.
+Benefits of winsorization:
 
-4. **Explainability & Trust**  
-   Ensure findings are interpretable and statistically validated for stakeholder decision-making.
+* It reduces extreme values
+* It does not reduce the number of data points
+* It stabilizes statistical calculations
 
 ---
 
-### 1.6 Key Business Questions
-The analysis seeks to answer the following questions:
+## 3. Detection of Multicollinearity Using Correlation Matrix
 
-- How does credit score influence loan repayment behavior?
-- Does a higher debt-to-income ratio significantly increase default risk?
-- Are certain loan purposes associated with higher default rates?
-- How do employment status and education level affect repayment outcomes?
-- Are interest rates adequately compensating for borrower risk?
+A **correlation matrix** was applied to examine relationships between numerical features.
 
----
+Highly correlated features are said to **contain redundant information**. These features may impair statistical model performance.
 
-### 1.7 Key Metrics (KPIs)
+Steps applied:
 
-**Portfolio-Level Metrics**
-- Overall default rate
-- Average loan amount
-- Average interest rate
-
-**Risk Metrics**
-- Default rate by credit score band
-- Default rate by income bracket
-- Default rate by employment status
-- Default rate by loan purpose
-
-**Model Evaluation Metrics**
-- ROC-AUC
-- Precision and Recall
-- False Positive and False Negative rates
-
-Accuracy is intentionally avoided due to class imbalance and unequal misclassification costs.
+* Calculated correlations between numerical features
+* Identified features that are strongly correlated with each other (correlation = ±1)
+* Examined features that may exhibit redundancy
 
 ---
 
-### 1.8 Analytical Assumptions
-- Historical repayment behavior is indicative of future default risk.
-- Borrower attributes are accurately reported.
-- The dataset represents a stable lending environment without major economic disruptions.
+## 4. Variance Inflation Factor Analysis
+
+To detect **multicollinearity** between features, **Variance Inflation Factor** was calculated for all numerical features.
+
+**Variance Inflation Factor** measures how strongly each feature is explained by other features.
+
+Results interpretation:
+
+| VIF Value | Interpretation             |
+| --------- | -------------------------- |
+| < 5       | Low multicollinearity      |
+| 5-10      | Moderate multicollinearity |
+| > 10      | High multicollinearity     |
+
+Features with very high values of **Variance Inflation Factor** are removed.
 
 ---
 
-### 1.9 Constraints & Limitations
-- No time-based repayment history is available.
-- Behavioral transaction data is not provided.
-- Analysis is based on a static snapshot of borrower information.
+## 5. Categorical Feature Selection Using Chi-Square Test
 
-These constraints influence model selection and interpretation of results.
+**Chi-Square Test of Independence** was applied to categorical features. It examines whether categorical features are statistically significantly associated with the target variable, **loan default**.
 
----
+This test helps identify categorical features that are important in predicting **loan default**.
 
-### 1.10 Success Criteria
-The analysis is considered successful if:
-- High-risk borrower segments are clearly identified.
-- Risk drivers are statistically validated.
-- Models demonstrate strong discriminatory power (ROC-AUC).
-- Insights are interpretable and actionable.
-- Findings can be effectively communicated to stakeholders through visual analytics.
+Two values are calculated:
+
+* **p-value** - Determines statistical significance
+* **Cramér’s V** - Determines strength of association
+
+Features with strong relationships were kept for further analysis.
 
 ---
 
-### 1.11 Research Perspective
-This project approaches loan default prediction from a **research and decision-science perspective**, emphasizing:
-- Statistical rigor  
-- Interpretability  
-- Risk-aware evaluation  
-- Business-aligned insights  
+# Key Outcomes
 
-Rather than focusing solely on predictive performance, the goal is to generate reliable, explainable, and actionable credit risk insights. 
+After the preprocessing, the data set was further refined through the following processes:
+
+* Reduction of the effect of extreme outliers
+* Deletion of highly correlated numerical features
+* Deletion of redundant features using VIF
+* Selecting relevant categorical variables using statistical tests
+
+This resulted in a clean and structured data set ready for predictive modeling.
+
+---
+
+# Tools and Libraries Used
+
+* Python
+* Pandas
+* NumPy
+* Matplotlib
+* Seaborn
+* SciPy
+* Statsmodels
+
+---
+
+# Future Work
+
+Possible future work for this project includes:
+
+* Feature engineering
+* Risk segmentation
+* Development of machine learning models for default prediction
+* Evaluation of the models using metrics such as AUC, KS statistic, and Confusion matrix
+* Development of a credit risk scorecard
